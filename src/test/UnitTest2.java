@@ -8,6 +8,13 @@ import model.Empregado;
 import model.Ferias;
 import model.Projeto;
 
+import org.hibernate.HibernateException;
+import org.hibernate.Query;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.cfg.Configuration;
+import org.hibernate.service.ServiceRegistry;
+import org.hibernate.service.ServiceRegistryBuilder;
 import org.junit.Test;
 
 import dao.Dao;
@@ -41,7 +48,7 @@ public class UnitTest2
 		emp2.setDepartamento(dep1);
 		emp2.setIdEmpregado(2);
 		
-		emp3.setNomeEmpregado("raffogel"); 
+		emp3.setNomeEmpregado("rafael fogel"); 
 		emp3.setNumeroDependentes(5); 
 		emp3.setSalario(3000); 
 		emp3.setDepartamento(dep2);
@@ -71,31 +78,13 @@ public class UnitTest2
 		Projeto pro2 = new Projeto();
 		Projeto pro3 = new Projeto();
 		
-		
-		
-		/*List<Projeto> projetos1 = new ArrayList<Projeto>();
-		List<Projeto> projetos2 = new ArrayList<Projeto>();
-		List<Projeto> projetos3 = new ArrayList<Projeto>();
-		
-		projetos1.add(pro1);
-		projetos1.add(pro2);
-		
-		projetos2.add(pro1);
-		
-		projetos3.add(pro1);
-		
-		emp1.setProjetos(projetos1);
-		
-		emp2.setProjetos(projetos2);
-		
-		emp3.setProjetos(projetos3);
-						*/
 		dao.save(dep1);
 		dao.save(dep2);
 		dao.save(emp1);
 		dao.save(emp2);
 		dao.save(emp3);
 		
+		//--------------------------------------------------
 		
 		List<Empregado> empregados1 = new ArrayList<Empregado>();
 		List<Empregado> empregados2 = new ArrayList<Empregado>();
@@ -121,9 +110,46 @@ public class UnitTest2
 		
 		dao.save(pro1);
 		dao.save(pro2);
-		dao.save(pro3);	
+		dao.save(pro3);				
+	}
+	
+	@SuppressWarnings("unchecked")
+	@Test
+	public void getTabela()
+	{
+		System.out.println("getTabela");
+		
+		SessionFactory sessionFactory;
+		ServiceRegistry serviceRegistry;
+		Configuration configuration;
+		
+		configuration = new Configuration().configure();
+		serviceRegistry = new ServiceRegistryBuilder().applySettings(configuration.getProperties()).buildServiceRegistry();
+		sessionFactory = configuration.buildSessionFactory(serviceRegistry);
+		
+		Session session = null;
+		
+		List<Empregado> result = new ArrayList<Empregado>();
+
+		try
+		{
+			session = sessionFactory.openSession();
+			Query query = session.createQuery("select nomeEmpregado, salario from Empregado");
+			result = query.list();
+			session.close();
+			
+			for ( Empregado e : result ){
+				System.out.println(e.getNomeEmpregado());
+			}
+
+		} catch (HibernateException e) {
+			System.out.println("erro");
+			e.printStackTrace();
+			session.close();
+		}
 		
 		
+
 	}
 }
 
